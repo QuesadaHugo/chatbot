@@ -8,7 +8,7 @@ import { Api } from "./api.js";
  * @class Bot
  */
 export class Bot {
-    chatGptSecretKey = "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";
+    chatGptSecretKey = "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";
     chatGptUrl = "https://api.openai.com/v1";
 
     name = "";
