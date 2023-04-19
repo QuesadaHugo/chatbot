@@ -9,7 +9,7 @@ export class Conversation {
     picture = "";
     title = "";
     id = 0;
-    me = "Hugo";
+    me = "Vous";
     mePicture = "me.jpg";
     isDisplayed = false;
 
@@ -25,7 +25,7 @@ export class Conversation {
 
     loadMessages() {
         //TODO : récupération des conversations enregistrées dans le localStorage
-        this.addMessage("Hugo", "Bonjour");
+        this.addMessage("Vous", "Bonjour");
     }
 
     addParticipant(participant){
@@ -61,9 +61,16 @@ export class Conversation {
     sendCommand(prompt) {
         for (let bot of this.participants) {
             const response = bot.runCommand(prompt);
-    
-            if(response != ""){
-                this.addMessage(bot.name, response);
+
+            if(typeof response == "object") {
+                //Promise on attend la reponse avant d'envoyer le message
+                response.then((res) => {
+                    this.addMessage(bot.name, res);
+                });
+            }else{
+                if(response != ""){
+                    this.addMessage(bot.name, response);
+                }
             }
         }
     }

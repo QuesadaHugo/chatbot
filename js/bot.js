@@ -1,5 +1,7 @@
 'use strict';
 
+import { Api } from "./api.js";
+
 /**
  * Abstract Class Bot.
  *
@@ -9,13 +11,16 @@ export class Bot {
     name = "";
     picture = "";
     commandsList = [];
+    api = null;
+
     static sharedCommands() { return [{ cmd: "info", desc: "Affiche la description d'une commande" }, { cmd: "help", desc: "Affiche la liste des commandes" }, { cmd: "ping", desc: "Ping... Pong!" }]; }
 
-    constructor(picture, name, commandsList) {
+    constructor(picture, name, commandsList, apiUrl = "") {
         if (this.constructor == Bot) {
             throw new Error("Abstract classes can't be instantiated.");
         }
         
+        this.api = new Api(apiUrl);
         this.picture = picture;
         this.name = name;
         this.setCommandsList(commandsList);

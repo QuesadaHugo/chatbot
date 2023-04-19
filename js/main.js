@@ -3,7 +3,7 @@
 import { Conversation } from "./conversation.js";
 import { ChameteoBot } from "./bots/chameteo.js";
 import { ChapostalBot } from "./bots/chapostal.js";
-import { ChagpsBot } from "./bots/chagps.js";
+import { ChageoBot } from "./bots/chageo.js";
 
 const conversations = [];
 let mainConversationId = 0;
@@ -18,7 +18,7 @@ function seedConversation(){
     mainConversationId = conversation.id;
 
     conversation.addParticipant(new ChameteoBot());
-    conversation.addParticipant(new ChagpsBot());
+    conversation.addParticipant(new ChageoBot());
     conversation.addParticipant(new ChapostalBot());
 
     conversation.isDisplayed = true;
@@ -26,7 +26,7 @@ function seedConversation(){
     conversations.push(conversation);
 }
 
-window.sendCommand=(prompt = "") => {
+window.sendCommand = (prompt = "") => {
     const input = document.getElementById('message');
     if(prompt == "") prompt = input.value;
 
@@ -83,9 +83,5 @@ loadConversations();
 refreshSidePanel();
 
 //Envoi de commandes de test
-sendCommand("gps Paris Toulouse");
-sendCommand("cp 09100");
-sendCommand("ping");
-sendCommand("meteo Pamiers");
 sendCommand("help");
 
