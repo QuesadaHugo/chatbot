@@ -8,19 +8,32 @@ import { Api } from "./api.js";
  * @class Bot
  */
 export class Bot {
+    chatGptSecretKey = "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";
+    chatGptUrl = "https://api.openai.com/v1";
+
     name = "";
     picture = "";
     commandsList = [];
     api = null;
+    openai = null;
 
-    static sharedCommands() { return [{ cmd: "info", desc: "Affiche la description d'une commande" }, { cmd: "help", desc: "Affiche la liste des commandes" }, { cmd: "ping", desc: "Ping... Pong!" }]; }
+    static sharedCommands() { return [{ cmd: "info", desc: "Affiche la description d'une commande" }, { cmd: "help", desc: "Affiche la liste des commandes" }, { cmd: "ping", desc: "Ping... Pong!" }, { cmd: "chat", desc: "Permet de poser une question à un bot (usage: chat NOM_DU_BOT TEXTE)" }, { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP" }]; }
 
-    constructor(picture, name, commandsList, apiUrl = "") {
+    constructor(picture, name, commandsList) {
         if (this.constructor == Bot) {
             throw new Error("Abstract classes can't be instantiated.");
         }
         
-        this.api = new Api(apiUrl);
+        this.api = new Api();
+
+        this.openai = axios.create({
+            baseURL: this.chatGptUrl,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.chatGptSecretKey}`,
+            },
+        });
+
         this.picture = picture;
         this.name = name;
         this.setCommandsList(commandsList);
@@ -65,6 +78,10 @@ export class Bot {
                 return this.help();
             case "ping":
                 return this.ping();
+            case "chat":
+                return this.chat(args);
+            case "debug":
+                return this.debug();
         }
     }
 
@@ -91,6 +108,40 @@ export class Bot {
     //Affiche la liste des commandes
     help() {
         return `Affichage de la liste des commandes :<br/>${this.commandsList.map(c => `  - ${c.cmd}: ${c.desc}`).join("<br/>")}`;
+    }
+
+    //Chat avec un bot
+    chat(args) {
+        const splitArgs = args.split(" ");
+        const botName = splitArgs[0];
+        const text = splitArgs.slice(1).join(" ");
+
+        if(botName.toLowerCase() == this.name.toLowerCase()) {
+            try {
+                const messages = [
+                    { role: "user", content: text },
+                ];
+
+                return this.openai.post("/chat/completions", {
+                    model: "gpt-3.5-turbo",
+                    messages,
+                }).then((response) => {
+                    return response.data.choices[0].message.content;
+                });
+            } catch (error) {
+                return "Erreur durant la création du chat" + error;
+            }
+        }
+
+        return "";
+    }
+
+    //Petit rebelle
+    debug() {
+        return `<video controls autoplay>
+            <source src="./assets/rick.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>`;
     }
 
     //#endregion

@@ -4,13 +4,25 @@ import { Conversation } from "./conversation.js";
 import { ChameteoBot } from "./bots/chameteo.js";
 import { ChapostalBot } from "./bots/chapostal.js";
 import { ChageoBot } from "./bots/chageo.js";
+import { ConversationSerialization } from "./models/conversation.serialization.js";
 
 const conversations = [];
 let mainConversationId = 0;
 
 function loadConversations() {
-    //TODO : récupération des conversations enregistrées dans le localStorage
-    seedConversation();
+    const items = { ...localStorage };
+
+    const keys = Object.keys(items);
+
+    for (let i = 0; i < keys.length; i++) {
+        let conversation = ConversationSerialization.deserialize(items[keys[i]]);
+
+        if(conversation.isDisplayed) mainConversationId = conversation.id;
+
+        conversations.push(conversation);
+    }
+
+    if(keys.length == 0) seedConversation();
 }
 
 function seedConversation(){
@@ -24,16 +36,28 @@ function seedConversation(){
     conversation.isDisplayed = true;
 
     conversations.push(conversation);
+
+    sendCommand("help");
 }
 
 window.sendCommand = (prompt = "") => {
+    if(conversations.length == 0) return;
+
     const input = document.getElementById('message');
     if(prompt == "") prompt = input.value;
 
-    const conversation = conversations.find(c => c.isDisplayed);
-    conversation.sendMessage(prompt);
+    prompt = prompt.trim();
 
-    input.value = "";
+    if(!isNullOrWhitespace(prompt)){
+        const conversation = conversations.find(c => c.isDisplayed);
+        conversation.sendMessage(prompt);
+
+        input.value = "";
+    }
+}
+
+function isNullOrWhitespace(input) {
+    return !input || input.replace(/\s/g, '').length < 1;
 }
 
 document.addEventListener('keydown', (event) => {
@@ -45,6 +69,10 @@ document.addEventListener('keydown', (event) => {
 
     if(isFocused && event.code == "Enter") sendCommand();
   }, false);
+
+document.addEventListener("new-message", function(e) {
+    refreshSidePanel();
+});
 
 //#region Affichage
 
@@ -81,7 +109,4 @@ loadConversations();
 
 //On rafraichit le panneau latéral (les contacts)
 refreshSidePanel();
-
-//Envoi de commandes de test
-sendCommand("help");
 

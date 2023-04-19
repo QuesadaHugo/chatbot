@@ -19,7 +19,7 @@ export class ChageoBot extends Bot {
     }
 
     gps(args) {
-        const data = this.api.getSynch(`${this.url}name=${args}&count=1&language=fr&format=json`);
+        const data = this.api.get(`${this.url}name=${args}&count=1&language=fr&format=json`);
 
         return data.then(response => {
             if(response.data.results){

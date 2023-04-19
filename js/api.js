@@ -4,11 +4,7 @@ export class Api {
     constructor() {
     }
 
-    get = (url) => {
+    get(url) {
         return axios.get(`${url}`);
-    }
-
-    async getSynch(url) {
-        return await this.get(url);
     }
 }

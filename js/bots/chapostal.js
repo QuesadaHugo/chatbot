@@ -19,11 +19,11 @@ export class ChapostalBot extends Bot {
     }
 
     zipCode(args) {
-        const data = this.api.getSynch(`${this.url}${args}`);
+        const data = this.api.get(`${this.url}${args}`);
 
         return data.then(response => {
             if(response.data.length > 0){
-                return "Ville(s) liée(s) au code postal :</br>" + response.data.map(x => x.nomCommune).join(",</br>");
+                return "Ville(s) liée(s) au code postal :<br/>" + response.data.map(x => x.nomCommune).join(",<br/>");
             }
 
             return "La recherche n'a pas abouti";

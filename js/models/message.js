@@ -3,10 +3,11 @@ export class Message {
     date;
     participant;
 
-    constructor(participant, message) {
+    constructor(participant, message, date = null) {
         this.participant = participant;
         this.message = message;
-        this.date = new Date();
+        if (date == null) date = new Date();
+        this.date = date;
     }
 
     getFormattedDateWithTime() {

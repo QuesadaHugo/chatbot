@@ -6,7 +6,7 @@ export class ChameteoBot extends Bot {
     url = "https://api.open-meteo.com/v1/forecast?"
 
     constructor() {
-        super("chameteo.png", "ChameteoBot", [{ cmd: "meteo", desc: "Affiche la météo d'une ville.</br>Arguments attendus (2): [latitude] [longitude]" }]);
+        super("chameteo.png", "ChameteoBot", [{ cmd: "meteo", desc: "Affiche la météo d'une ville. (usage meteo LATITUDE LONGITUDE)" }]);
     }
 
     runCustomCommand(command, args) {
@@ -23,7 +23,7 @@ export class ChameteoBot extends Bot {
 
         const splitArgs = args.split(" ");
 
-        const data = this.api.getSynch(`${this.url}latitude=${splitArgs[0]}&longitude=${splitArgs[1]}&hourly=temperature_2m`);
+        const data = this.api.get(`${this.url}latitude=${splitArgs[0]}&longitude=${splitArgs[1]}&hourly=temperature_2m`);
 
         return data.then(response => {
             let moy = response.data.hourly.temperature_2m.reduce((a, b) => a + b, 0) / response.data.hourly.temperature_2m.length;

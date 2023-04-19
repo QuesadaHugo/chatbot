@@ -1,6 +1,9 @@
 "use strict";
 
 import { Message } from "./models/message.js";
+import { ConversationSerialization } from "./models/conversation.serialization.js";
+
+const event = new CustomEvent("new-message", {});
 
 export class Conversation {
     //Liste des messages de la conversation
@@ -13,22 +16,25 @@ export class Conversation {
     mePicture = "me.jpg";
     isDisplayed = false;
 
-    constructor(title, picture){
-        this.id = Math.floor(Math.random() * 1000000);
+    constructor(title, picture, id = 0) {
+        if (id != 0) this.id = id;
+        else this.id = Math.floor(Math.random() * 1000000);
+
         this.title = title;
         this.picture = picture;
 
-        //TODO: récupération des conversations enregistrées dans le localStorage
         this.messages = [];
-        this.loadMessages();
     }
 
-    loadMessages() {
-        //TODO : récupération des conversations enregistrées dans le localStorage
-        this.addMessage("Vous", "Bonjour");
+    loadMessages(mes) {
+        for (let i = 0; i < mes.length; i++) {
+            this.messages.push(new Message(mes[i].participant, mes[i].message, new Date(mes[i].date)));
+        }
+
+        this.refreshConversation();
     }
 
-    addParticipant(participant){
+    addParticipant(participant) {
         this.participants.push(participant);
 
         this.setConversationParticipantsDisplay();
@@ -39,66 +45,76 @@ export class Conversation {
         participants.innerHTML = `${this.me}, ${this.getParticipants()}`;
     }
 
-    getParticipants(){
+    getParticipants() {
         return this.participants.map(participant => participant.name).join(', ');
     }
 
-    addMessage(participant, message){
-        this.messages.push(new Message(participant, message));
+    addMessage(participant, message, date = null) {
+        this.messages.push(new Message(participant, message, date));
 
         this.refreshConversation();
+
+        localStorage.setItem(this.id, JSON.stringify(new ConversationSerialization(this)));
     }
 
-    getMessages(){
+    getMessages() {
         return this.messages;
     }
 
     sendMessage(prompt) {
         this.addMessage(this.me, prompt);
         this.sendCommand(prompt);
+
+        document.dispatchEvent(event);
     }
 
     sendCommand(prompt) {
         for (let bot of this.participants) {
             const response = bot.runCommand(prompt);
 
-            if(typeof response == "object") {
+            if (typeof response == "object") {
                 //Promise on attend la reponse avant d'envoyer le message
                 response.then((res) => {
                     this.addMessage(bot.name, res);
                 });
-            }else{
-                if(response != ""){
+            } else {
+                if (response != "") {
                     this.addMessage(bot.name, response);
                 }
             }
         }
     }
 
-    getLastMessage(){
-        if(this.messages.length == 0) return "Aucun message";
-        return this.messages.sort((a, b) => a.date > b.date)[0].message;
+    getLastMessage() {
+        if (this.messages.length == 0) return "Aucun message";
+        let message = this.messages[this.messages.length - 1].message;
+
+        message = message.replaceAll("<br/>", " ");
+
+        if (message.length > 50) return message.substring(0, 50) + "...";
+
+        return message;
     }
 
-    getLastMessageDate(){
-        if(this.messages.length == 0) return "";
-        return this.messages.sort((a, b) => a.date > b.date)[0].getFormattedDateWithTime();
+    getLastMessageDate() {
+        if (this.messages.length == 0) return "";
+        return this.messages[this.messages.length - 1].getFormattedDate();
     }
 
-    getFirstMessageDate(){
-        if(this.messages.length == 0) return "";
-        return this.messages.sort((a, b) => a.date < b.date)[0].getFormattedDate();
+    getFirstMessageDate() {
+        if (this.messages.length == 0) return "";
+        return this.messages[0].getFormattedDate();
     }
 
     refreshConversation() {
-        if(!this.isDisplayed) return;
+        if (!this.isDisplayed) return;
 
         const conversation = document.getElementById('conversation');
         conversation.innerHTML = "";
 
         //Entete de la conversation
-        conversation.innerHTML += 
-        `<div class="flex justify-center mb-2">
+        conversation.innerHTML +=
+            `<div class="flex justify-center mb-2">
             <div class="rounded py-2 px-4" style="background-color: #DDECF2">
                 <p class="text-sm uppercase">
                     ${this.getFirstMessageDate()}
@@ -114,14 +130,14 @@ export class Conversation {
                 </p>
             </div>
         </div>`;
-    
+
         for (let message of this.messages) {
-            conversation.innerHTML += 
-            `<div class="flex ${message.participant == this.me ? "justify-end" : ""} mb-2">
+            conversation.innerHTML +=
+                `<div class="flex ${message.participant == this.me ? "justify-end" : ""} mb-2">
                 <div class="mr-4">
                     <img class="h-12 w-12 rounded-full" src="./assets/${this.getParticipantPicture(message.participant)}" />
                 </div>
-                <div class="rounded pl-1 pr-3" style="background-color: #F2F2F2">
+                <div class="rounded pl-1 pr-3 message" style="background-color: #F2F2F2">
                     <div class="rounded py-2 px-3">
                         <p class="text-sm text-teal font-medium">
                             ${message.participant}
@@ -137,14 +153,16 @@ export class Conversation {
             </div>`;
         }
 
-        conversation.scrollIntoView({ block: "end" });
+        setTimeout(function () {
+            conversation.scrollIntoView({ block: "end" });
+        }, 100);
     }
 
-    getParticipantPicture(participant){
-        if(participant == this.me) return this.mePicture;
+    getParticipantPicture(participant) {
+        if (participant == this.me) return this.mePicture;
 
         const participantFound = this.participants.find(p => p.name == participant);
-        if(participantFound) return participantFound.picture;
+        if (participantFound) return participantFound.picture;
         return "";
     }
 }
