@@ -157,6 +157,11 @@ export class Conversation {
         setTimeout(function () {
             conversation.scrollIntoView({ block: "end" });
         }, 100);
+
+        //Un second scroll pour les images plus lourdes
+        setTimeout(function () {
+            conversation.scrollIntoView({ block: "end" });
+        }, 2000);
     }
 
     getParticipantPicture(participant) {
