@@ -53,8 +53,6 @@ export class Conversation {
         this.messages.push(new Message(participant, message, date));
 
         this.refreshConversation();
-
-        localStorage.setItem(this.id, JSON.stringify(new ConversationSerialization(this)));
     }
 
     getMessages() {

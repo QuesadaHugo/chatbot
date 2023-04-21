@@ -22,9 +22,7 @@ export class ConversationSerialization {
         this.isDisplayed = conversation.isDisplayed;
     }
 
-    static deserialize(data) {
-        let conv = JSON.parse(data);
-
+    static deserialize(conv) {
         const conversation = new Conversation(conv.title, conv.picture, conv.id);
         conversation.isDisplayed = conv.isDisplayed;
 

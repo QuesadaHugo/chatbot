@@ -10,22 +10,22 @@ const conversations = [];
 let mainConversationId = 0;
 
 function loadConversations() {
-    const items = { ...localStorage };
+    const data = JSON.parse(localStorage.getItem("conversations"));
 
-    const keys = Object.keys(items);
+    if (data !== null) {
+        for(let i = 0; i < data.length; i++) {
+            let conversation = ConversationSerialization.deserialize(data[i]);
+            if (conversation.isDisplayed) mainConversationId = conversation.id;
 
-    for (let i = 0; i < keys.length; i++) {
-        let conversation = ConversationSerialization.deserialize(items[keys[i]]);
-
-        if(conversation.isDisplayed) mainConversationId = conversation.id;
-
-        conversations.push(conversation);
+            conversations.push(conversation);
+        }
     }
-
-    if(keys.length == 0) seedConversation();
+    else {
+        seedConversation();
+    }
 }
 
-function seedConversation(){
+function seedConversation() {
     const conversation = new Conversation("Le QG des bots", "qgbot.png");
     mainConversationId = conversation.id;
 
@@ -41,14 +41,14 @@ function seedConversation(){
 }
 
 window.sendCommand = (prompt = "") => {
-    if(conversations.length == 0) return;
+    if (conversations.length == 0) return;
 
     const input = document.getElementById('message');
-    if(prompt == "") prompt = input.value;
+    if (prompt == "") prompt = input.value;
 
     prompt = prompt.trim();
 
-    if(!isNullOrWhitespace(prompt)){
+    if (!isNullOrWhitespace(prompt)) {
         const conversation = conversations.find(c => c.isDisplayed);
         conversation.sendMessage(prompt);
 
@@ -67,11 +67,14 @@ document.addEventListener('keydown', (event) => {
     // check for focus
     var isFocused = (document.activeElement === input);
 
-    if(isFocused && event.code == "Enter") sendCommand();
-  }, false);
+    if (isFocused && event.code == "Enter") sendCommand();
+}, false);
 
-document.addEventListener("new-message", function(e) {
+document.addEventListener("new-message", function (e) {
     refreshSidePanel();
+
+    let conversationsSerialized = conversations.map(c => new ConversationSerialization(c));
+    localStorage.setItem("conversations", JSON.stringify(conversationsSerialized));
 });
 
 //#region Affichage
@@ -81,8 +84,8 @@ function refreshSidePanel() {
     contacts.innerHTML = "";
 
     for (let conversation of conversations) {
-        contacts.innerHTML += 
-        `<div class="${conversation.isDisplayed ? "bg-gray-100" : "bg-white"} px-3 flex items-center bg-grey-light cursor-pointer">
+        contacts.innerHTML +=
+            `<div class="${conversation.isDisplayed ? "bg-gray-100" : "bg-white"} px-3 flex items-center bg-grey-light cursor-pointer">
             <div>
                 <img class="h-12 w-12 rounded-full" src="./assets/${conversation.picture}" />
             </div>

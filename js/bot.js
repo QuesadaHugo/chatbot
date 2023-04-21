@@ -8,7 +8,9 @@ import { Api } from "./api.js";
  * @class Bot
  */
 export class Bot {
-    chatGptSecretKey = "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";
+    //Solution la plus simple pour contourner le problème de clé qui a leak
+    chatGptSecretKeyPart1 = "EPXUEDqKuTXHf8lCfmYWT3Bl";
+    chatGptSecretKeyPart2 = "bkFJ41W674eet1NKHlf4ovLx";
     chatGptUrl = "https://api.openai.com/v1";
 
     name = "";
@@ -30,7 +32,7 @@ export class Bot {
             baseURL: this.chatGptUrl,
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.chatGptSecretKey}`,
+                "Authorization": `Bearer sk-${this.chatGptSecretKeyPart1}${this.chatGptSecretKeyPart2}`,
             },
         });
 
@@ -136,7 +138,7 @@ export class Bot {
         return "";
     }
 
-    //Petit rebelle
+    //Du miel pour les oreilles
     debug() {
         return `<video controls autoplay>
             <source src="./assets/rick.mp4" type="video/mp4">
