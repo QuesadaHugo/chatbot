@@ -18,7 +18,15 @@ export class Bot {
     commandsList = [];
     openai = null;
 
-    static sharedCommands() { return [{ cmd: "info", desc: "Affiche la description d'une commande" }, { cmd: "help", desc: "Affiche la liste des commandes" }, { cmd: "ping", desc: "Ping... Pong!" }, { cmd: "chat", desc: "Permet de poser une question à un bot (usage: chat NOM_DU_BOT TEXTE)" }, { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP" }]; }
+    get sharedCommands() { 
+        return [
+            { cmd: "info", desc: "Affiche la description d'une commande. (usage: info COMMANDE)" }, 
+            { cmd: "help", desc: "Affiche la liste des commandes. (usage: help)" }, 
+            { cmd: "ping", desc: "Ping... Pong!. (usage: ping)" }, 
+            { cmd: "chat", desc: "Permet de poser une question à un bot. (usage: chat NOM_DU_BOT TEXTE)" }, 
+            { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP. (usage: debug)" }
+        ]; 
+    }
 
     constructor(picture, name, commandsList) {
         this.openai = axios.create({
@@ -35,7 +43,7 @@ export class Bot {
     }
 
     set commands(commandsList) {
-        this.commandsList = Bot.sharedCommands();
+        this.commandsList = this.sharedCommands;
         this.commandsList = this.commandsList.concat(commandsList);
     }
 
