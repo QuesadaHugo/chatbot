@@ -1,5 +1,7 @@
 'use strict';
 
+const eventClean = new CustomEvent("clean-chat", {});
+
 /**
  * Abstract Class Bot.
  *
@@ -75,6 +77,8 @@ export class Bot {
                 return this.doggo();
             case "translate":
                 return this.translate(args);
+            case "clean":
+                return this.clean();
             default:
                 return "";
         }
@@ -213,6 +217,12 @@ export class Bot {
 
             return "La traduction n'a pas abouti";
         });
+    }
+
+    //nettoie le chat
+    clean() {
+        document.dispatchEvent(eventClean);
+        return "Chat nettoyé";
     }
 
     //#endregion

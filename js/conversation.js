@@ -26,6 +26,12 @@ export class Conversation {
         this.messages = [];
     }
 
+    clean() {
+        this.messages = [];
+        this.refreshConversation();
+        document.dispatchEvent(event);
+    }
+
     loadMessages(mes) {
         for (let i = 0; i < mes.length; i++) {
             this.messages.push(new Message(mes[i].participant, mes[i].message, new Date(mes[i].date)));

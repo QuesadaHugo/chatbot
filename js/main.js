@@ -31,6 +31,7 @@ function seedConversation() {
     conversation.addParticipant(new Bot("chageo.png", "GeoBot", [{ cmd: "locate", desc: "Donne la latitude et la longitude d'une ville. (usage locate VILLE)" }]));
     conversation.addParticipant(new Bot("chapostal.png", "PostalBot", [{ cmd: "cp", desc: "Affiche la/les ville(s) liée(s) au code postal. (usage cp CODEPOSTAL)" }]));
     conversation.addParticipant(new Bot("chadoggo.png", "DoggoBot", [{ cmd: "doggo", desc: "Affiche une image aléatoire de chien" }, { cmd: "translate", desc: "Traduit une phrase en langage doggo. (usage: translate MA PHRASE)" }]));
+    conversation.addParticipant(new Bot("chaclean.png", "CleanBot", [{ cmd: "clean", desc: "Réinitialise la conversation" }]));
 
     conversation.isDisplayed = true;
 
@@ -74,6 +75,11 @@ document.addEventListener("new-message", function (e) {
 
     let conversationsSerialized = conversations.map(c => new ConversationSerialization(c));
     localStorage.setItem("conversations", JSON.stringify(conversationsSerialized));
+});
+
+document.addEventListener("clean-chat", function (e) {
+    const conversation = conversations.find(c => c.isDisplayed);
+    conversation.clean();
 });
 
 //#region Affichage
