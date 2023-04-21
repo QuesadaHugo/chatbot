@@ -71,6 +71,10 @@ export class Bot {
                 return this.gps(args);
             case "meteo":
                 return this.meteo(args);
+            case "doggo":
+                return this.doggo();
+            case "translate":
+                return this.translate(args);
             default:
                 return "";
         }
@@ -180,6 +184,34 @@ export class Bot {
             }
 
             return "La recherche n'a pas abouti";
+        });
+    }
+
+    //retourne une image de chien
+    doggo() {
+        const data = axios.get("https://api.thedogapi.com/v1/images/search");
+        
+        return data.then(response => {
+            if(response.data){
+                if(response.data.length > 0){
+                    return `<img src="${response.data[0].url}" alt="doggo" />`;
+                }
+            }
+
+            return "La recherche n'a pas abouti";
+        });
+    }
+
+    //traduit une phrase en doggo
+    translate(args) {
+        const data = axios.get(`https://api.funtranslations.com/translate/doge.json?text=${args}`);
+        
+        return data.then(response => {
+            if(response.data){
+                return response.data.contents.translated;
+            }
+
+            return "La traduction n'a pas abouti";
         });
     }
 
