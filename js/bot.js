@@ -24,7 +24,6 @@ export class Bot {
             { cmd: "help", desc: "Affiche la liste des commandes. (usage: help)" }, 
             { cmd: "ping", desc: "Ping... Pong!. (usage: ping)" }, 
             { cmd: "chat", desc: "Permet de poser une question à un bot. (usage: chat NOM_DU_BOT TEXTE)" }, 
-            { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP. (usage: debug)" }
         ]; 
     }
 

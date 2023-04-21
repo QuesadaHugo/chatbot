@@ -31,7 +31,7 @@ function seedConversation() {
     conversation.addParticipant(new Bot("chageo.png", "GeoBot", [{ cmd: "locate", desc: "Donne la latitude et la longitude d'une ville. (usage locate VILLE)" }]));
     conversation.addParticipant(new Bot("chapostal.png", "PostalBot", [{ cmd: "cp", desc: "Affiche la/les ville(s) liée(s) au code postal. (usage cp CODEPOSTAL)" }]));
     conversation.addParticipant(new Bot("chadoggo.png", "DoggoBot", [{ cmd: "doggo", desc: "Affiche une image aléatoire de chien. (usage: doggo)" }, { cmd: "translate", desc: "Traduit une phrase en langage doggo. (usage: translate MA PHRASE)" }]));
-    conversation.addParticipant(new Bot("chaclean.png", "CleanBot", [{ cmd: "clean", desc: "Réinitialise la conversation. (usage: clean)" }]));
+    conversation.addParticipant(new Bot("chaclean.png", "CleanBot", [{ cmd: "clean", desc: "Réinitialise la conversation. (usage: clean)" }, { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP. (usage: debug)" }]));
 
     conversation.isDisplayed = true;
 
