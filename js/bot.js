@@ -78,7 +78,6 @@ export class Bot {
 
     //Vérifie si la commande est valide
     checkCommand(command) {
-        console.log(this.commandsList);
         return this.commandsList.map(c => c.cmd).includes(command);
     }
 

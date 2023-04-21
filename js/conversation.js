@@ -84,8 +84,6 @@ export class Conversation {
         if (this.messages.length == 0) return "Aucun message";
         let message = this.messages[this.messages.length - 1].message;
 
-        console.log(message);
-
         message = message.replaceAll("<br/>", " ");
 
         if (message.length > 50) return message.substring(0, 50) + "...";

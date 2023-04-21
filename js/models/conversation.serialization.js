@@ -25,7 +25,6 @@ export class ConversationSerialization {
         conversation.isDisplayed = conv.isDisplayed;
 
         conv.participants.forEach(participant => {
-            console.log(participant);
             conversation.addParticipant(new Bot(participant.picture, participant.name, participant.commandsList));
         });
 
