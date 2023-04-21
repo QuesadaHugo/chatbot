@@ -1,9 +1,7 @@
 "use strict";
 
 import { Conversation } from "./conversation.js";
-import { ChameteoBot } from "./bots/chameteo.js";
-import { ChapostalBot } from "./bots/chapostal.js";
-import { ChageoBot } from "./bots/chageo.js";
+import { Bot } from "./bot.js";
 import { ConversationSerialization } from "./models/conversation.serialization.js";
 
 const conversations = [];
@@ -29,9 +27,9 @@ function seedConversation() {
     const conversation = new Conversation("Le QG des bots", "qgbot.png");
     mainConversationId = conversation.id;
 
-    conversation.addParticipant(new ChameteoBot());
-    conversation.addParticipant(new ChageoBot());
-    conversation.addParticipant(new ChapostalBot());
+    conversation.addParticipant(new Bot("chameteo.png", "ChameteoBot", [{ cmd: "meteo", desc: "Affiche la météo d'une ville. (usage meteo LATITUDE LONGITUDE)" }]));
+    conversation.addParticipant(new Bot("chageo.png", "ChageoBot", [{ cmd: "locate", desc: "Donne la latitude et la longitude d'une ville" }]));
+    conversation.addParticipant(new Bot("chapostal.png", "ChapostalBot", [{ cmd: "cp", desc: "Affiche la/les ville(s) liée(s) au code postal" }]));
 
     conversation.isDisplayed = true;
 
@@ -95,11 +93,11 @@ function refreshSidePanel() {
                         ${conversation.title}
                     </p>
                     <p class="text-xs text-grey-darkest">
-                        ${conversation.getLastMessageDate()}
+                        ${conversation.lastMessageDate}
                     </p>
                 </div>
                 <p class="text-grey-dark mt-1 text-sm">
-                    ${conversation.getLastMessage()}
+                    ${conversation.lastMessage}
                 </p>
             </div>
         </div>`;

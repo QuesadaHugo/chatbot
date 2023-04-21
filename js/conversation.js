@@ -42,28 +42,23 @@ export class Conversation {
 
     setConversationParticipantsDisplay() {
         const participants = document.getElementById('participants');
-        participants.innerHTML = `${this.me}, ${this.getParticipants()}`;
+        participants.innerHTML = `${this.me}, ${this.getParticipants}`;
     }
 
-    getParticipants() {
+    get getParticipants() {
         return this.participants.map(participant => participant.name).join(', ');
     }
 
     addMessage(participant, message, date = null) {
         this.messages.push(new Message(participant, message, date));
+        document.dispatchEvent(event);
 
         this.refreshConversation();
-    }
-
-    getMessages() {
-        return this.messages;
     }
 
     sendMessage(prompt) {
         this.addMessage(this.me, prompt);
         this.sendCommand(prompt);
-
-        document.dispatchEvent(event);
     }
 
     sendCommand(prompt) {
@@ -74,18 +69,22 @@ export class Conversation {
                 //Promise on attend la reponse avant d'envoyer le message
                 response.then((res) => {
                     this.addMessage(bot.name, res);
+                    document.dispatchEvent(event);
                 });
             } else {
                 if (response != "") {
                     this.addMessage(bot.name, response);
+                    document.dispatchEvent(event);
                 }
             }
         }
     }
 
-    getLastMessage() {
+    get lastMessage() {
         if (this.messages.length == 0) return "Aucun message";
         let message = this.messages[this.messages.length - 1].message;
+
+        console.log(message);
 
         message = message.replaceAll("<br/>", " ");
 
@@ -94,12 +93,12 @@ export class Conversation {
         return message;
     }
 
-    getLastMessageDate() {
+    get lastMessageDate() {
         if (this.messages.length == 0) return "";
         return this.messages[this.messages.length - 1].getFormattedDate();
     }
 
-    getFirstMessageDate() {
+    get firstMessageDate() {
         if (this.messages.length == 0) return "";
         return this.messages[0].getFormattedDate();
     }
@@ -115,7 +114,7 @@ export class Conversation {
             `<div class="flex justify-center mb-2">
             <div class="rounded py-2 px-4" style="background-color: #DDECF2">
                 <p class="text-sm uppercase">
-                    ${this.getFirstMessageDate()}
+                    ${this.firstMessageDate}
                 </p>
             </div>
         </div>

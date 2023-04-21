@@ -1,7 +1,5 @@
 'use strict';
 
-import { Api } from "./api.js";
-
 /**
  * Abstract Class Bot.
  *
@@ -16,18 +14,11 @@ export class Bot {
     name = "";
     picture = "";
     commandsList = [];
-    api = null;
     openai = null;
 
     static sharedCommands() { return [{ cmd: "info", desc: "Affiche la description d'une commande" }, { cmd: "help", desc: "Affiche la liste des commandes" }, { cmd: "ping", desc: "Ping... Pong!" }, { cmd: "chat", desc: "Permet de poser une question à un bot (usage: chat NOM_DU_BOT TEXTE)" }, { cmd: "debug", desc: "Commande de test, ne pas utiliser SVP" }]; }
 
     constructor(picture, name, commandsList) {
-        if (this.constructor == Bot) {
-            throw new Error("Abstract classes can't be instantiated.");
-        }
-        
-        this.api = new Api();
-
         this.openai = axios.create({
             baseURL: this.chatGptUrl,
             headers: {
@@ -38,10 +29,10 @@ export class Bot {
 
         this.picture = picture;
         this.name = name;
-        this.setCommandsList(commandsList);
+        this.commands = commandsList;
     }
 
-    setCommandsList(commandsList) {
+    set commands(commandsList) {
         this.commandsList = Bot.sharedCommands();
         this.commandsList = this.commandsList.concat(commandsList);
     }
@@ -55,24 +46,14 @@ export class Bot {
             //récupération des arguments de la commande
             const args = prompt.split(" ").slice(1).join(" ");
 
-            if(Bot.sharedCommands().map(c => c.cmd).includes(command)) {
-                return this.runSharedCommand(command, args);
-            }
-            else 
-            {
-                return this.runCustomCommand(command, args);
-            }
+            return this.executeCommand(command, args);
         }
 
         return "";
     }
 
-    runCustomCommand(command, args) {
-        throw new Error("Method 'runCustomCommand()' must be implemented.");
-    }
-
     //Exécute une commande partagée par tous les bots
-    runSharedCommand(command, args) {
+    executeCommand(command, args) {
         switch(command) {
             case "info":
                 return this.info(args);
@@ -84,11 +65,20 @@ export class Bot {
                 return this.chat(args);
             case "debug":
                 return this.debug();
+            case "cp":
+                return this.zipCode(args);
+            case "locate":
+                return this.gps(args);
+            case "meteo":
+                return this.meteo(args);
+            default:
+                return "";
         }
     }
 
     //Vérifie si la commande est valide
     checkCommand(command) {
+        console.log(this.commandsList);
         return this.commandsList.map(c => c.cmd).includes(command);
     }
 
@@ -144,6 +134,54 @@ export class Bot {
             <source src="./assets/rick.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>`;
+    }
+
+    //#endregion
+
+    //#region Commandes spécifiques
+
+    
+    //Retourne les villes liées à un code postal
+    zipCode(args) {
+        const data = axios.get(`https://apicarto.ign.fr/api/codes-postaux/communes/${args}`);
+
+        return data.then(response => {
+            if(response.data.length > 0){
+                return "Ville(s) liée(s) au code postal :<br/>" + response.data.map(x => x.nomCommune).join(",<br/>");
+            }
+
+            return "La recherche n'a pas abouti";
+        });
+    }
+
+    //Retourne la température moyenne d'une ville sur la journée
+    meteo(args) {
+        if(args.split(" ").length != 2) return "Erreur: 2 argument attendu, exemple: meteo 43.12 1.61";
+
+        const splitArgs = args.split(" ");
+        const data = axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${splitArgs[0]}&longitude=${splitArgs[1]}&hourly=temperature_2m`);
+
+        return data.then(response => {
+            let moy = response.data.hourly.temperature_2m.reduce((a, b) => a + b, 0) / response.data.hourly.temperature_2m.length;
+            moy = Math.round(moy * 100) / 100;
+
+            return "Temperature moyenne sur la journée : " +  moy + "°C";
+        });
+    }
+
+    //Retourne les coordonnées GPS d'une ville
+    gps(args) {
+        const data = axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${args}&count=1&language=fr&format=json`);
+
+        return data.then(response => {
+            if(response.data.results){
+                if(response.data.results.length > 0){
+                    return "Latitude : " + response.data.results[0].latitude + ", Longitude : " + response.data.results[0].longitude;
+                }
+            }
+
+            return "La recherche n'a pas abouti";
+        });
     }
 
     //#endregion

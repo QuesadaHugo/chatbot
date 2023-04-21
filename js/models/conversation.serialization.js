@@ -1,9 +1,7 @@
 "use strict";
 
 import { Conversation } from "../conversation.js";
-import { ChameteoBot } from "../bots/chameteo.js";
-import { ChapostalBot } from "../bots/chapostal.js";
-import { ChageoBot } from "../bots/chageo.js";
+import { Bot } from "../bot.js";
 
 export class ConversationSerialization {
     messages;
@@ -27,17 +25,8 @@ export class ConversationSerialization {
         conversation.isDisplayed = conv.isDisplayed;
 
         conv.participants.forEach(participant => {
-            switch (participant.name) {
-                case "ChameteoBot":
-                    conversation.addParticipant(new ChameteoBot());
-                    break;
-                case "ChapostalBot":
-                    conversation.addParticipant(new ChapostalBot());
-                    break;
-                case "ChageoBot":
-                    conversation.addParticipant(new ChageoBot());
-                    break;
-            }
+            console.log(participant);
+            conversation.addParticipant(new Bot(participant.picture, participant.name, participant.commandsList));
         });
 
         conversation.loadMessages(conv.messages);
