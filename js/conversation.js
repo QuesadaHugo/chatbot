@@ -67,7 +67,7 @@ export class Conversation {
         this.sendCommand(prompt);
     }
 
-    sendCommand(prompt) {
+    sendCommand(prompt) { 
         for (let bot of this.participants) {
             const response = bot.runCommand(prompt);
 

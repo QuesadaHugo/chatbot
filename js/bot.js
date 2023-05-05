@@ -46,9 +46,11 @@ export class Bot {
         this.commandsList = this.commandsList.concat(commandsList);
     }
 
-    //A redéfinir dans les classes enfants
     runCommand(prompt) {
         //récupération du premier mot de la commande
+
+        prompt = prompt.toLowerCase();
+
         const command = prompt.split(" ")[0];
 
         if(this.checkCommand(command)) {
@@ -130,6 +132,7 @@ export class Bot {
 
                 return this.openai.post("/chat/completions", {
                     model: "gpt-3.5-turbo",
+                    max_tokens: 100,
                     messages,
                 }).then((response) => {
                     return response.data.choices[0].message.content;

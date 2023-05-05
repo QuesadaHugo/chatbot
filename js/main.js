@@ -11,7 +11,7 @@ function loadConversations() {
     const data = JSON.parse(localStorage.getItem("conversations"));
 
     if (data !== null) {
-        for(let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             let conversation = ConversationSerialization.deserialize(data[i]);
             if (conversation.isDisplayed) mainConversationId = conversation.id;
 
